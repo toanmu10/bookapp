@@ -69,6 +69,15 @@
         android:background="@color/white"
         android:drawableStart="@drawable/ic_search_gray"
         android:textColorHint="@color/gray01"/>
+<!--    <TextView-->
+<!--        android:id="@+id/tvCount"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_below="@+id/searchEt"-->
+<!--        android:background="@color/gray01"-->
+<!--        android:textColor="@color/black"-->
+
+<!--        />-->
 
     <!-- Category   -->
     <androidx.recyclerview.widget.RecyclerView

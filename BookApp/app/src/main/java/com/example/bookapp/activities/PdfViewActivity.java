@@ -1,9 +1,14 @@
 package com.example.bookapp.activities;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -11,6 +16,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ZoomControls;
 
@@ -23,6 +29,7 @@ import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnTapListener;
+import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -32,17 +39,44 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.shockwave.pdfium.PdfDocument;
+
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class PdfViewActivity extends AppCompatActivity {
     private ActivityPdfViewBinding binding;
 
     private String bookId;
 
+    //test time
+    TextView timerText;
+    Button stopStartButton;
+
+    Timer timer;
+    TimerTask timerTask;
+    Double time = 0.0;
+
+    boolean timerStarted = false;
+    //
+
     //test zoom
+
+//    private static final String TAG1 = PdfViewActivity.class.getSimpleName();
+//    public static final String PDF_FILE = "TamCam.pdf";
+
+
+    PDFView pdfView ;
+//    Integer pageNumber;
+//    String pdfFileName;
+//
+//    Integer currentPageNumber;
+//    Integer savedPage;
 
     private Button btnZoomIn;
     private Button btnZoomOut ;
-    private PDFView pdfView ;
+//    private PDFView pdfView ;
     private ZoomControls simpleZoomControls;
     //
 
@@ -56,6 +90,31 @@ public class PdfViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityPdfViewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+
+        timerText = (TextView) findViewById(R.id.timerText);
+        stopStartButton = (Button) findViewById(R.id.startStopButton);
+
+        timer = new Timer();
+
+
+
+//        binding.luuBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                SharedPreferences mySharedPreferences = getPreferences(Context.MODE_PRIVATE);
+//
+//                savedPage = mySharedPreferences.getInt("retrievedPage",0);
+//
+//                pageNumber = savedPage;
+//
+//
+//
+//                pdfView = (PDFView)findViewById(R.id.pdfView);
+//                displayFromAsset(PDF_FILE);
+//
+//            }
+//        });
 
         //test
 
@@ -114,6 +173,26 @@ public class PdfViewActivity extends AppCompatActivity {
 
 
     }
+
+//
+    //}
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//
+//        SharedPreferences mySharedPreferences = getPreferences(Context.MODE_PRIVATE);
+//        SharedPreferences.Editor myEditor = mySharedPreferences.edit();
+//
+//
+//        savedPage = pdfView.getCurrentPage();
+//        myEditor.putInt("retrievedPage",savedPage);
+//        myEditor.apply();
+//
+//
+//    }
+
+
+
 
     private void loadBookDetails() {
         Log.d(TAG, "loadBookDetails: Get PDF Url from database");
@@ -215,7 +294,103 @@ public class PdfViewActivity extends AppCompatActivity {
 //        binding.pdfView.jumpTo(mCurrentPage);
 //    }
 
+    public void resetTapped(View view)
+    {
+        AlertDialog.Builder resetAlert = new AlertDialog.Builder(this);
+        resetAlert.setTitle("Reset Timer");
+        resetAlert.setMessage("Are you sure you want to reset the timer?");
+        resetAlert.setPositiveButton("Reset", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i)
+            {
+                if(timerTask != null)
+                {
+                    timerTask.cancel();
+                    setButtonUI("START", R.color.black);
+                    time = 0.0;
+                    timerStarted = false;
+                    timerText.setText(formatTime(0,0,0));
 
+                }
+            }
+        });
+
+        resetAlert.setNeutralButton("Cancel", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i)
+            {
+                //do nothing
+            }
+        });
+
+        resetAlert.show();
+
+    }
+
+    public void startStopTapped(View view)
+    {
+        if(timerStarted == false)
+        {
+            timerStarted = true;
+            setButtonUI("STOP", R.color.black);
+
+            startTimer();
+        }
+        else
+        {
+            timerStarted = false;
+            setButtonUI("START", R.color.black);
+
+            timerTask.cancel();
+        }
+    }
+
+    private void setButtonUI(String start, int color)
+    {
+        stopStartButton.setText(start);
+        stopStartButton.setTextColor(ContextCompat.getColor(this, color));
+    }
+
+    private void startTimer()
+    {
+        timerTask = new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        time++;
+                        timerText.setText(getTimerText());
+                    }
+                });
+            }
+
+        };
+        timer.scheduleAtFixedRate(timerTask, 0 ,1000);
+    }
+
+
+    private String getTimerText()
+    {
+        int rounded = (int) Math.round(time);
+
+        int seconds = ((rounded % 86400) % 3600) % 60;
+        int minutes = ((rounded % 86400) % 3600) / 60;
+        int hours = ((rounded % 86400) / 3600);
+
+        return formatTime(seconds, minutes, hours);
+    }
+
+    private String formatTime(int seconds, int minutes, int hours)
+    {
+        return String.format("%02d",hours) + " : " + String.format("%02d",minutes) + " : " + String.format("%02d",seconds);
+    }
 
 
 }

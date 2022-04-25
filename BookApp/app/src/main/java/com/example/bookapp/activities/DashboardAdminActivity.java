@@ -8,7 +8,10 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.bookapp.R;
 import com.example.bookapp.adapter.AdapterCategory;
 import com.example.bookapp.databinding.ActivityDashboardAdminBinding;
 import com.example.bookapp.models.ModelCategory;
@@ -30,6 +33,7 @@ public class DashboardAdminActivity extends AppCompatActivity {
     private ArrayList<ModelCategory> categoryArrayList;
 
     private AdapterCategory adapterCategory;
+    public int total ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +43,8 @@ public class DashboardAdminActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         checkUser();
         loadCategories();
+
+
 
         //Xu ly khi tim kiem
         binding.searchEt.addTextChangedListener(new TextWatcher() {
@@ -98,6 +104,9 @@ public class DashboardAdminActivity extends AppCompatActivity {
         });
     }
 
+
+
+
     private void loadCategories() {
         categoryArrayList = new ArrayList<>();
         //Lay ra cac category trong firebase
@@ -112,6 +121,13 @@ public class DashboardAdminActivity extends AppCompatActivity {
 
                     //add to arraylist
                     categoryArrayList.add(model);
+
+                    // get count
+//                    total = categoryArrayList.size() ;
+//                    TextView txt = (TextView)findViewById(R.id.tvCount);
+//                    txt.setText("Tổng số category :"+ total);
+//                    Toast.makeText(getApplicationContext(), "Total number of Items are:" + total , Toast.LENGTH_LONG).show();
+
                 }
 
                 //set up adapter
@@ -119,14 +135,26 @@ public class DashboardAdminActivity extends AppCompatActivity {
                 //set adapter to Recycler View
                 binding.categoriesRv.setAdapter(adapterCategory);
 
+                //get
+
+
+
+
+
             }
+
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
         });
-    }
+
+
+
+        }
+
+
 
     private void checkUser() {
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
@@ -141,4 +169,5 @@ public class DashboardAdminActivity extends AppCompatActivity {
             binding.subTitleTv.setText(email);
         }
     }
+
 }

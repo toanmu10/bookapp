@@ -149,4 +149,5 @@ public class AdapterCategory extends RecyclerView.Adapter<AdapterCategory.Holder
             deleteBtn = binding.deleteBtn;
         }
     }
+
 }

@@ -20,6 +20,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class PdfListAdminActivity extends AppCompatActivity {
     private ActivityPdfListAdminBinding binding;
@@ -96,6 +98,25 @@ public class PdfListAdminActivity extends AppCompatActivity {
 
                             Log.d(TAG,""+model.getId()+""+model.getTitle());
                         }
+                        //sort by title
+//                        Collections.sort(pdfArrayList, new Comparator<ModelPdf>() {
+//                            @Override
+//                            public int compare(ModelPdf t1, ModelPdf t2) {
+//                                return t1.getTitle().compareTo(t2.getTitle());
+//                            }
+//                        });
+
+                        //sort by timestamps
+//                        Collections.sort(pdfArrayList, new Comparator<ModelPdf>() {
+//                            @Override
+//                            public int compare(ModelPdf t1, ModelPdf t2) {
+//                                long r1 =  t1.getTimestamp();
+//                                long r2 =  t2.getTimestamp();
+//                                int a = (int) (r2 - r1);
+//                                Log.e("r",""+ a  );
+//                                return a;
+//                            }
+//                        });
                         //set up adapter
                         adapterPdfAdmin = new AdapterPdfAdmin(PdfListAdminActivity.this,pdfArrayList);
                         binding.bookRv.setAdapter(adapterPdfAdmin);

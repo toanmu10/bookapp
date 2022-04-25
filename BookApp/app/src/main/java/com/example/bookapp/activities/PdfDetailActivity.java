@@ -143,6 +143,7 @@ public class PdfDetailActivity extends AppCompatActivity {
                     Toast.makeText(PdfDetailActivity.this, "You're not log in", Toast.LENGTH_SHORT).show();
                 }else{
                     addCommentDialog();
+
                 }
             }
         });
@@ -206,6 +207,7 @@ public class PdfDetailActivity extends AppCompatActivity {
                 }else{
                     alertDialog.dismiss();
                     addComment();
+                    Toast.makeText(PdfDetailActivity.this, "Bạn có 1 thông báo mới", Toast.LENGTH_SHORT).show();
                 }
             }
         });
